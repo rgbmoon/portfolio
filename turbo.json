@@ -12,7 +12,8 @@
       "dependsOn": ["transit"]
     },
     "lint": {
-      "dependsOn": ["transit"]
+      "dependsOn": ["transit"],
+      "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/eslint.config.ts"]
     },
     "test": {
       "dependsOn": ["transit"]

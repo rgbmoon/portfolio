@@ -86,7 +86,6 @@ packages/
   contracts/      Zod schemas: REST DTOs, WS messages, events, error code registry
   ui/             design system: tokens, Tailwind theme, components
   pixi-charts/    chart rendering on PixiJS
-  config/         shared presets for tsconfig, ESLint, Prettier, Vitest
 infra/
   local/          docker compose for development
   deploy/         production compose, Caddyfile, scripts
@@ -100,6 +99,9 @@ docs/
 The structure is refined in iteration 0. A package appears when it is first needed; empty placeholders are not created.
 Workspace packages use the scope `@portfolio/*`. Folders matching `*.local/` (working files, review materials) are
 ignored by git (section 11.4). Reflect every change in this section.
+
+Shared configs live in the root: `tsconfig.base.json` (every package `tsconfig.json` extends it), `eslint.config.ts`,
+`.prettierrc.json`.
 
 Documents with rules:
 
@@ -466,8 +468,7 @@ This is an engineering interpretation of GDPR and ePrivacy, not legal advice.
 
 ### 6.3 Quality
 
-- Strict tsconfig: `strict`, `noUncheckedIndexedAccess`; the other flags are determined in iteration 0. Per-package
-  TypeScript settings — section 11.8.
+- Strict tsconfig: the flag list and per-package TypeScript settings — section 11.8.
 - ESLint 10 flat config: typescript-eslint `strictTypeChecked`, eslint-plugin-boundaries, a ban on `process.env` outside
   the config module. Steiger for FSD, Prettier.
 - No accessibility lint plugin: eslint-plugin-jsx-a11y declares support only up to ESLint 9, and its fork
@@ -574,7 +575,7 @@ Goal: a working monorepo with quality tools and a local environment.
 Scope:
 - Start procedure: done on 2026-11-08 — rules transferred (section 11), versions checked (section 3), language and git
   process agreed (sections 2 and 11.3).
-- Monorepo per section 4, `packages/config` with shared presets.
+- Monorepo per section 4, shared root configs: tsconfig base, ESLint, Prettier.
 - pnpm catalog with exact versions, Renovate rules (section 6.4), supply chain protection in CI (section 6.1).
 - Strict TypeScript and linting (section 6.3), Husky, lint-staged, commitlint, gitleaks.
 - Choice of the api builder (SWC or Rspack) with decorator metadata.
@@ -949,6 +950,9 @@ read early becomes more expensive with each following step.
 - Data that can be computed in advance is computed by a script, and the result is committed. Runtime computation
   disappears, and tests check constraints on the real data.
 - The build is minimal for the task: abstractions for hypothetical extension appear only on request.
+- Self-check for overengineering: after writing a solution, compare its size with the task. If the solution follows the
+  rules formally but is bulky (more files, entities or indirection than the task needs), design a simpler variant and
+  present both to Sergei; he chooses which one stays.
 
 ### 11.7 Architecture and imports
 
@@ -974,10 +978,12 @@ read early becomes more expensive with each following step.
 ### 11.8 Code conventions
 
 **File layout:**
-- `<name>.ts` holds one class and nothing else: no free functions, types, constants or singletons.
-- `types.ts`, `constants.ts`, `utils.ts`, `tokens.ts` hold the types, constants, utilities and DI tokens of a layer.
-  A `utils/` folder appears when `utils.ts` grows and splits by topic; imports address files directly, the folder has no
-  barrel.
+- The split rules of this item apply only to code with classes. A class file `<name>.ts` holds one class and nothing
+  else: no free functions, types, constants or singletons. The types, constants, utilities and DI tokens of a layer
+  with classes live in `types.ts`, `constants.ts`, `utils.ts`, `tokens.ts`. A `utils/` folder appears when `utils.ts`
+  grows and splits by topic; imports address files directly, the folder has no barrel.
+- Code without classes (tool configs, config factories, function modules) follows the layout of the official examples
+  of the library in use. If the layout is not obvious, ask Sergei.
 - No empty placeholder files; no module-scope singletons (the exception is the entry point).
 - `index.ts` exists only as the public API of an FSD slice and of an api module; inside them, imports address files.
   Packages expose their API through `exports` in `package.json`. Internal packages are JIT: `exports` point to `.ts`
@@ -1017,8 +1023,9 @@ read early becomes more expensive with each following step.
   `#src/*` form the internal group.
 
 **TypeScript:**
-- `strict`, `noUncheckedIndexedAccess`, `verbatimModuleSyntax`, `noUnusedLocals`, `noUnusedParameters`; unused
-  parameters have a `_` prefix. Other flags — iteration 0.
+- `strict`, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`, `noImplicitOverride`, `noImplicitReturns`,
+  `verbatimModuleSyntax`, `noUnusedLocals`, `noUnusedParameters`; unused parameters have a `_` prefix. They live in
+  the root `tsconfig.base.json`; a package `tsconfig.json` adds only its own options (`types`, `lib`, decorators).
 - `erasableSyntaxOnly` everywhere except `apps/api`. `apps/api` follows the Nest idiom: `experimentalDecorators` and
   `emitDecoratorMetadata` are on, parameter properties (`constructor(private readonly users: UsersService)`) are
   allowed. Rspack bundles the api (ADR-0002), so Node type stripping compatibility gives it nothing.
@@ -1114,6 +1121,9 @@ General principles. The backend strategy is defined in iteration 2, the frontend
   the source or the script.
 - Automated e2e tests run through the Playwright runner. Manual viewing and clicking in the live UI — only for a task
   that needs a visual or interactive check.
+- ESLint has one `eslint.config.ts` in the repository root. ESLint 10 finds it from any package folder; rules of one
+  package are blocks with `files` patterns relative to the root. ESLint loads the TypeScript config through `jiti`:
+  without it ESLint 10 needs the unstable flag `unstable_native_nodejs_ts_config`.
 
 **CI and deploy:**
 - Turborepo caches tasks by the hash of their inputs; an edit in a package's `src` invalidates the cache of tasks in

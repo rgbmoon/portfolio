@@ -5,9 +5,16 @@ packages:
 # Exact versions shared by all workspace packages (CLAUDE.md section 6.4). A pinned version must be older than
 # minimumReleaseAge, otherwise install fails.
 catalog:
+  '@eslint/js': 10.0.1
+  '@types/node': 26.6.6
+  eslint: 10.14.0
+  eslint-import-resolver-typescript: 4.4.5
+  eslint-plugin-import-x: 4.17.1
+  jiti: 2.7.0
   prettier: 3.9.10
   turbo: 2.11.10
   typescript: 6.0.3
+  typescript-eslint: 8.72.1
 
 # Supply chain (CLAUDE.md section 6.1): install only versions published at least 3 days ago.
 minimumReleaseAge: 4320
