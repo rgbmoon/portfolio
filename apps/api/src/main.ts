@@ -11,4 +11,5 @@ app.setGlobalPrefix('api/v1')
 app.enableShutdownHooks()
 
 const config = app.get<ConfigService<Env, true>>(ConfigService)
+app.enableCors({ origin: config.get('WEB_ORIGIN', { infer: true }), credentials: true })
 await app.listen(config.get('PORT', { infer: true }), config.get('HOST', { infer: true }))

@@ -21,10 +21,12 @@ Two strategies:
   only.
 - `exports` use no custom conditions. In the prototype (2026-11-09) Rspack, Vitest and tsc resolved the package
   sources without configuration.
-- Import specifiers of own files in `packages/*` and `apps/api` carry the `.ts` extension. The path names the real file;
-  Rspack needs no `extensionAlias`; plain Node 26 loads package sources and `tools/` scripts without `tsx` (checked in
-  the prototype). `tsconfig` sets `allowImportingTsExtensions` and `noEmit`. Rejected alternative: `.js` specifiers,
-  the TypeScript `nodenext` idiom used in Nest examples; they name a file that exists only after compilation.
+- Import specifiers of own files in `packages/*`, `apps/api` and `apps/web` carry the `.ts` or `.tsx` extension. The
+  path names the real file; Rspack needs no `extensionAlias`; plain Node 26 loads package sources and `tools/` scripts
+  without `tsx` (checked in the prototype). In `apps/web` tsc with `moduleResolution: bundler` resolves `#src/*` only
+  with the extension (checked on 2026-11-09). `tsconfig` sets `allowImportingTsExtensions` and `noEmit`. Rejected
+  alternative: `.js` specifiers, the TypeScript `nodenext` idiom used in Nest examples; they name a file that exists
+  only after compilation.
 
 ## Alternatives
 

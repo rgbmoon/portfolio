@@ -442,7 +442,9 @@ This is an engineering interpretation of GDPR and ePrivacy, not legal advice.
 - Raw SQL — parameterized only.
 - Logs contain no personal data or tokens (`redact` in Pino).
 - Headers: Helmet for the API (`nosniff`, `frame-ancestors`); CSP and HSTS for static files — in Caddy.
-- CORS with `credentials: true` — only for the exact origin of the web app.
+- CORS with `credentials: true` — only for the exact origin of the web app (`WEB_ORIGIN` of the api). In development web
+  calls the api directly by `VITE_API_URL`, without a Vite proxy: requests are cross-origin as in production, so CORS
+  and `credentials: 'include'` errors show up locally.
 - Request body limit — 100 KB for JSON by default, separate limits on specific routes.
 - Every endpoint with a user resource has a test "another user's ID → 404".
 
@@ -471,7 +473,8 @@ This is an engineering interpretation of GDPR and ePrivacy, not legal advice.
 
 - Strict tsconfig: the flag list and per-package TypeScript settings — section 11.8.
 - ESLint 10 flat config: typescript-eslint `strictTypeChecked`, eslint-plugin-boundaries, a ban on `process.env` outside
-  the config module. Steiger for FSD, Prettier.
+  the config module. In `apps/web` — eslint-plugin-react-hooks `recommended` with `exhaustive-deps` as an error.
+  Steiger for FSD, Prettier.
 - No accessibility lint plugin: eslint-plugin-jsx-a11y declares support only up to ESLint 9, and its fork
   `eslint-plugin-jsx-a11y-x` is not used. Accessibility follows section 6.5.
 - Husky and lint-staged: lint-staged runs Prettier and `eslint --fix` on staged files; typecheck runs in CI and through
@@ -1018,8 +1021,9 @@ read early becomes more expensive with each following step.
 **Imports:**
 - Own modules through the `imports` field of `package.json` (`#src/*`); another package by its name. Relative paths only
   for sibling and child files.
-- In `apps/api` and `packages/*` import specifiers of own files carry the `.ts` extension (`#src/app.module.ts`,
-  `./status.ts`): the path names the real file, and Node loads package sources and `tools/` scripts directly. Their
+- Import specifiers of own files carry the `.ts` or `.tsx` extension (`#src/app.module.ts`, `./status.ts`): the path
+  names the real file, and Node loads package sources and `tools/` scripts directly. In `apps/web` TypeScript resolves
+  `#src/*` only with the extension: `moduleResolution: bundler` does not add extensions to `imports` targets. Their
   `tsconfig` files set `allowImportingTsExtensions` and `noEmit`; tsc only checks types (ADR-0003).
 - ESLint enforces the order: `builtin → external → internal`, `react` first, alphabetical; monorepo packages and
   `#src/*` form the internal group.
@@ -1121,6 +1125,9 @@ General principles. The backend strategy is defined in iteration 2, the frontend
   data. Code that a Turborepo task generates deterministically from committed sources before typecheck is not
   committed: the Prisma client, the Paraglide output. A manual edit of a generated file is lost on the next run: edit
   the source or the script.
+- The TanStack Router route tree `apps/web/src/routeTree.gen.ts` is committed, as the TanStack Router FAQ recommends:
+  the Vite plugin regenerates it in `vite dev` and `vite build`, and typecheck rejects a route missing from a stale
+  tree. ESLint and Prettier skip the file.
 - Automated e2e tests run through the Playwright runner. Manual viewing and clicking in the live UI — only for a task
   that needs a visual or interactive check.
 - ESLint has one `eslint.config.ts` in the repository root. ESLint 10 finds it from any package folder; rules of one
