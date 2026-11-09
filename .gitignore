@@ -1,4 +1,8 @@
 node_modules/
+dist/
+.turbo/
+coverage/
+*.tsbuildinfo
 *.local/
 .env
 .env.local

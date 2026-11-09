@@ -46,7 +46,7 @@ Versions checked on 2026-11-08.
 | Package manager, monorepo | pnpm 12 workspaces + Turborepo | Exact versions of key packages in the pnpm catalog. Since pnpm 11 `.npmrc` holds only auth and registry, other settings live in `pnpm-workspace.yaml`; in pnpm 12 an unknown key there fails the command |
 | Language | TypeScript 6.0.3, strict mode | TS 7 is not used: typescript-eslint 8.x requires `<6.1.0`, `@nestjs/cli` depends on `~6.0.2` |
 | Backend | NestJS 12 (ESM), Express adapter | Fastify is not used: its support in the Better Auth integration is in beta |
-| api build | SWC or Rspack | Decorator metadata is mandatory; without it DI breaks silently. Choice — iteration 0 |
+| api build | Rspack 2: own code and `@portfolio/*` in one bundle, third-party packages external | TypeScript is compiled by the built-in `swc-loader` with decorator metadata; without metadata DI breaks silently. ADR-0002 |
 | Validation, contracts | Zod 4 in `packages/contracts`; `StandardSchemaValidationPipe`, `StandardSchemaSerializerInterceptor` | Standard Schema in Nest 12 |
 | OpenAPI | `@nestjs/swagger` 12 + `zod-openapi` via `standardSchemaConverter` | |
 | Configuration | `@nestjs/config` with env validation by a Zod schema | |
@@ -793,8 +793,6 @@ all modules.
 
 | Question | Where decided |
 |---|---|
-| api builder: SWC or Rspack | Iteration 0 |
-| Internal packages strategy: JIT or prebuilt | Iteration 0 |
 | Env files: a committed `.env` with non-secret values (pixi-demos) or only `.env.example` without values (section 6.1) | Iteration 0 |
 | Confirmation of direct contract import instead of client generation | Iteration 1 |
 | Public identifier: UUIDv7 or a separate opaque ID | Iteration 1 |
@@ -982,7 +980,8 @@ read early becomes more expensive with each following step.
   barrel.
 - No empty placeholder files; no module-scope singletons (the exception is the entry point).
 - `index.ts` exists only as the public API of an FSD slice and of an api module; inside them, imports address files.
-  Packages expose their API through `exports` in `package.json`.
+  Packages expose their API through `exports` in `package.json`. Internal packages are JIT: `exports` point to `.ts`
+  sources, and every consumer compiles them; packages have no build step (ADR-0003).
 - Zod schemas of REST DTOs, WS messages and events live in `packages/contracts`; `z.infer` types sit next to their
   schemas.
 
@@ -1011,6 +1010,9 @@ read early becomes more expensive with each following step.
 **Imports:**
 - Own modules through the `imports` field of `package.json` (`#src/*`); another package by its name. Relative paths only
   for sibling and child files.
+- In `apps/api` and `packages/*` import specifiers of own files carry the `.ts` extension (`#src/app.module.ts`,
+  `./status.ts`): the path names the real file, and Node loads package sources and `tools/` scripts directly. Their
+  `tsconfig` files set `allowImportingTsExtensions` and `noEmit`; tsc only checks types (ADR-0003).
 - ESLint enforces the order: `builtin → external → internal`, `react` first, alphabetical; monorepo packages and
   `#src/*` form the internal group.
 
@@ -1019,7 +1021,7 @@ read early becomes more expensive with each following step.
   parameters have a `_` prefix. Other flags — iteration 0.
 - `erasableSyntaxOnly` everywhere except `apps/api`. `apps/api` follows the Nest idiom: `experimentalDecorators` and
   `emitDecoratorMetadata` are on, parameter properties (`constructor(private readonly users: UsersService)`) are
-  allowed. The api is compiled by SWC or Rspack, so Node type stripping compatibility gives it nothing.
+  allowed. Rspack bundles the api (ADR-0002), so Node type stripping compatibility gives it nothing.
 
 **Asynchrony:**
 - `async/await` with `try/catch`; `.then()/.catch()` are not used (the exception is the constructor of a deferred
@@ -1030,6 +1032,8 @@ read early becomes more expensive with each following step.
 **Formatting:**
 - `.prettierrc.json`: no semicolons, single quotes, 120 columns. lint-staged formats staged files (section 6.3).
   Do not reformat other code by hand.
+- Markdown is excluded from Prettier (`.prettierignore`): Prettier pads table columns to the widest cell, and an edit of
+  one cell rewrites the whole table. Markdown is wrapped at 120 columns by hand.
 
 **Avoid:**
 - `any`, `@ts-ignore`, `console.*`, `debugger` (api logs through Pino; in web the exceptions are trace functions).
@@ -1102,8 +1106,8 @@ General principles. The backend strategy is defined in iteration 2, the frontend
 
 ### 11.11 Tooling
 
-- Node scripts that import application modules without file extensions run through `tsx`: Node type stripping does not
-  resolve such modules.
+- Node scripts run by plain `node`: import specifiers carry `.ts` (section 11.8). A script that imports modules without
+  file extensions runs through `tsx`: Node type stripping does not resolve such modules.
 - Generated output that is reviewed in a diff or checked by CI is committed: `openapi.json` for oasdiff, precomputed
   data. Code that a Turborepo task generates deterministically from committed sources before typecheck is not
   committed: the Prisma client, the Paraglide output. A manual edit of a generated file is lost on the next run: edit

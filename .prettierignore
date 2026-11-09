@@ -1,0 +1,3 @@
+pnpm-lock.yaml
+# Markdown is formatted by hand: Prettier pads tables to the widest cell (CLAUDE.md section 11.8).
+*.md

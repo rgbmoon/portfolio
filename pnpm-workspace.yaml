@@ -1,0 +1,15 @@
+packages:
+  - apps/*
+  - packages/*
+
+# Exact versions shared by all workspace packages (CLAUDE.md section 6.4). A pinned version must be older than
+# minimumReleaseAge, otherwise install fails.
+catalog:
+  prettier: 3.9.10
+  turbo: 2.11.10
+  typescript: 6.0.3
+
+# Supply chain (CLAUDE.md section 6.1): install only versions published at least 3 days ago.
+minimumReleaseAge: 4320
+# Install fails on a Node version outside `engines` of the root package.json.
+engineStrict: true
