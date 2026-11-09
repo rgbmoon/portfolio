@@ -6,15 +6,30 @@ packages:
 # minimumReleaseAge, otherwise install fails.
 catalog:
   '@eslint/js': 10.0.1
+  '@nestjs/common': 12.4.0
+  '@nestjs/config': 12.1.1
+  '@nestjs/core': 12.4.0
+  '@nestjs/platform-express': 12.4.0
+  '@rspack/cli': 2.3.1
+  '@rspack/core': 2.3.1
   '@types/node': 26.6.6
   eslint: 10.14.0
   eslint-import-resolver-typescript: 4.4.5
+  eslint-plugin-boundaries: 7.4.2
   eslint-plugin-import-x: 4.17.1
   jiti: 2.7.0
+  nestjs-pino: 5.3.1
+  pino: 10.4.0
+  pino-http: 11.0.0
+  pino-pretty: 13.2.0
   prettier: 3.9.10
+  reflect-metadata: 0.2.2
+  rxjs: 7.8.2
   turbo: 2.11.10
   typescript: 6.0.3
   typescript-eslint: 8.72.1
+  vitest: 5.1.0
+  zod: 4.6.7
 
 # Supply chain (CLAUDE.md section 6.1): install only versions published at least 3 days ago.
 minimumReleaseAge: 4320

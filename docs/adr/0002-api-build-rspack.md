@@ -61,6 +61,8 @@ refuses to strip types from files under `node_modules`. In development the pnpm 
   dependencies of third-party packages.
 - The same choice is the Nest 12 default for Nest CLI monorepo mode: "Rspack can significantly reduce build times and
   produces a single file".
+- Node resolves the external imports of the bundle from `apps/api`, so a third-party package that an internal package
+  imports must also be a dependency of `apps/api` (`zod` for `contracts`).
 - Third-party packages must stay external. OpenTelemetry auto-instrumentation and Sentry patch modules that Node loads
   from `node_modules`; a bundled copy of Express, `pg` or Prisma would not be instrumented.
 - The build transform (SWC inside Rspack) differs from the test transform: Vitest 5 compiles sources with Oxc (Vite 8)

@@ -428,8 +428,9 @@ This is an engineering interpretation of GDPR and ePrivacy, not legal advice.
 
 ### 6.1 Security (the repository is public)
 
-- Secrets live only in environment variables and GitHub Environments. The repository contains `.env.example` without
-  values. Docker images contain no secrets.
+- Secrets live only in environment variables and GitHub Environments. Each app has a `.env.example` with keys and
+  comments and without values; a developer copies it to the git-ignored `.env` and fills it in. Docker images contain
+  no secrets.
 - gitleaks in pre-commit and CI, secret scanning and push protection in GitHub.
 - **Supply chain (OWASP A03:2025):**
   - `minimumReleaseAge` in pnpm — 3 days;
@@ -794,8 +795,8 @@ all modules.
 
 | Question | Where decided |
 |---|---|
-| Env files: a committed `.env` with non-secret values (pixi-demos) or only `.env.example` without values (section 6.1) | Iteration 0 |
 | Confirmation of direct contract import instead of client generation | Iteration 1 |
+| Optional fields in Zod contracts under `exactOptionalPropertyTypes`: `.optional()` or `.exactOptional()` | Iteration 1 |
 | Public identifier: UUIDv7 or a separate opaque ID | Iteration 1 |
 | Fully static web output or a separate container | Iteration 3 |
 | Case page content format | Iteration 3 |
@@ -986,8 +987,9 @@ read early becomes more expensive with each following step.
   of the library in use. If the layout is not obvious, ask Sergei.
 - No empty placeholder files; no module-scope singletons (the exception is the entry point).
 - `index.ts` exists only as the public API of an FSD slice and of an api module; inside them, imports address files.
-  Packages expose their API through `exports` in `package.json`. Internal packages are JIT: `exports` point to `.ts`
-  sources, and every consumer compiles them; packages have no build step (ADR-0003).
+  Packages expose their API through `exports` in `package.json`, one explicit entry per public file
+  (`"./health": "./src/health.ts"`); files without an entry stay internal. Internal packages are JIT: `exports` point
+  to `.ts` sources, and every consumer compiles them; packages have no build step (ADR-0003).
 - Zod schemas of REST DTOs, WS messages and events live in `packages/contracts`; `z.infer` types sit next to their
   schemas.
 
