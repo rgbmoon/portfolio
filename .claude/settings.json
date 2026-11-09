@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(pnpm lint *)",
+      "Bash(pnpm typecheck *)",
+      "Bash(pnpm test *)",
+      "Bash(pnpm test:e2e *)",
+      "Bash(pnpm build *)",
+      "Bash(pnpm verify *)",
+      "Bash(pnpm format:check *)",
+      "Bash(pnpm exec turbo run *)",
+      "Bash(pnpm exec tsc *)",
+      "Bash(pnpm exec eslint *)",
+      "Bash(pnpm exec prettier *)",
+      "Bash(pnpm exec vitest *)",
+      "Bash(.claude/hooks/check.sh)",
+      "Bash(git status *)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git show *)",
+      "Bash(git branch *)",
+      "Bash(git switch *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push -u origin task/*)",
+      "Bash(git rev-parse *)",
+      "Bash(gh pr create *)",
+      "Bash(gh pr view *)",
+      "Bash(gh pr checks *)",
+      "Bash(gh pr diff *)",
+      "Bash(gh run list *)",
+      "Bash(gh run view *)"
+    ],
+    "deny": ["Read(**/.env)", "Read(**/.env.local)", "Bash(gh pr merge *)"]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [{ "type": "command", "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/guard-bash.sh" }]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [{ "type": "command", "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/format-file.sh" }]
+      }
+    ]
+  }
+}
