@@ -1,0 +1,15 @@
+{
+  "name": "@portfolio/contracts",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./health": "./src/health.ts"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "typecheck": "tsc"
+  },
+  "dependencies": {
+    "zod": "catalog:"
+  }
+}

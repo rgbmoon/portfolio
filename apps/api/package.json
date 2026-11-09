@@ -1,0 +1,35 @@
+{
+  "name": "@portfolio/api",
+  "private": true,
+  "type": "module",
+  "imports": {
+    "#src/*": "./src/*"
+  },
+  "scripts": {
+    "build": "rspack build",
+    "dev": "rspack build --watch",
+    "dev:start": "node --env-file-if-exists=.env --watch --enable-source-maps dist/main.js | pino-pretty",
+    "lint": "eslint .",
+    "typecheck": "tsc",
+    "test:e2e": "vitest run --config vitest.e2e.config.ts"
+  },
+  "dependencies": {
+    "@nestjs/common": "catalog:",
+    "@nestjs/config": "catalog:",
+    "@nestjs/core": "catalog:",
+    "@nestjs/platform-express": "catalog:",
+    "@portfolio/contracts": "workspace:*",
+    "nestjs-pino": "catalog:",
+    "pino": "catalog:",
+    "pino-http": "catalog:",
+    "reflect-metadata": "catalog:",
+    "rxjs": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@rspack/cli": "catalog:",
+    "@rspack/core": "catalog:",
+    "pino-pretty": "catalog:",
+    "vitest": "catalog:"
+  }
+}
