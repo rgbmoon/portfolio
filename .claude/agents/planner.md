@@ -21,8 +21,8 @@ You plan one task for the `/deliver` skill. The orchestrator passes the task tex
 2. Check versions, dist-tags and library capabilities against sources (CLAUDE.md sections 2 and 6.4). Settle a
    disputed detail with a short code run in the scratchpad (section 11.5).
 3. Write the plan file with the headings below.
-4. Return at most 15 lines: the plan path, the size estimate, the subtasks, the decisions needed. Do not repeat the
-   plan.
+4. Return at most 15 lines: the plan path, the size estimate, the mode, the subtasks, the decisions needed. Do not
+   repeat the plan.
 
 ## Plan headings
 
@@ -36,9 +36,19 @@ You plan one task for the `/deliver` skill. The orchestrator passes the task tex
 - **Test plan**: tests per the strategy in `docs/testing/` for each package and the criterion each test covers. If a
   package has no strategy yet, write `No strategy for <package>: tests are skipped`.
 - **Steps**: files to create or change, in order. No commit steps: the orchestrator commits (section 11.3).
-- **Verification**: exact commands.
+- **Verification**: exact commands. `.claude/hooks/guard-bash.sh` blocks commands that read, copy or move `.env`
+  files: check a missing `.env` with an empty env file (`--env-file /dev/null`) instead of renaming it.
 - **Size**: estimated changed lines without the lockfile and generated files. Above 400 lines, split the task into
   subtasks in dependency order, each with its own acceptance criteria; plan the first subtask in full.
+- **Mode**: `solo`, `pipeline` or `parallel`, with the reason (the `/deliver` skill runs the task by it):
+  - `solo`: at most 80 changed lines of code and configuration, without the lockfile, generated files and documents
+    (`*.md`). The main session does the whole task without agents.
+  - `parallel`: two or more parts, each of about 150 changed lines or more and each in its own workspace packages (for
+    example `apps/api` and `apps/web`). A **Shared step** before the parts changes the packages that several parts
+    import (`packages/contracts`, `packages/ui`), the dependencies and the lockfile. For each part list the packages,
+    the files, the interface it uses from the shared step (a Zod schema, a function signature), its tests and its
+    acceptance criteria.
+  - `pipeline`: every other task.
 - **Docs**: ADRs, CLAUDE.md items and roadmap entries to update.
 
 ## Rules

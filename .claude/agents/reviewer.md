@@ -38,4 +38,5 @@ VERDICT: PASS | FAIL
 - A blocking finding breaks behavior, security, an acceptance criterion or a mandatory rule. FAIL means at least one
   blocking finding.
 - Verify each finding against the code before reporting it; report only what you can point to by line.
-- At most 10 findings, most severe first. The answer contains nothing else.
+- At most 10 findings, most severe first. The answer contains nothing else: no list of checks that found no defect,
+  no notes for the orchestrator.
