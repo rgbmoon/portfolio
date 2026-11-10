@@ -112,9 +112,9 @@ Sections 5.1–5.13 are in the files listed in section 4.
 
 ### 6.1 Security (the repository is public)
 
-- Secrets live only in environment variables and GitHub Environments. Each app has a `.env.example` with keys and
-  comments and without values; a developer copies it to the git-ignored `.env` and fills it in. Docker images contain
-  no secrets.
+- Secrets live only in environment variables and GitHub Environments. Each app and `infra/local` has a `.env.example`
+  with keys and comments and without values; a developer copies it to the git-ignored `.env` and fills it in. Docker
+  images contain no secrets.
 - gitleaks in pre-commit and CI, secret scanning and push protection in GitHub.
 - **Supply chain (OWASP A03:2025):**
   - `minimumReleaseAge` in pnpm — 3 days;

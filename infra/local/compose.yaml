@@ -1,0 +1,48 @@
+# Local development infrastructure. Every published port is bound to 127.0.0.1 (CLAUDE.md section 6.7).
+# Credentials come from infra/local/.env (keys in infra/local/.env.example). The database holds local development data
+# only; its published port is bound to 127.0.0.1.
+name: portfolio
+
+services:
+  postgres:
+    image: postgres:18.6-trixie@sha256:3a4264520e121176619f54ff867d12774bc81e95e7b84db58d63bccdb6144b81
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:?set POSTGRES_USER in infra/local/.env (keys in infra/local/.env.example)}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in infra/local/.env (keys in infra/local/.env.example)}
+      POSTGRES_DB: ${POSTGRES_DB:?set POSTGRES_DB in infra/local/.env (keys in infra/local/.env.example)}
+    ports:
+      - '127.0.0.1:5432:5432'
+    volumes:
+      # The PostgreSQL 18 image keeps the cluster in /var/lib/postgresql/18/docker. A container started from this
+      # image exits when a volume is mounted at /var/lib/postgresql/data.
+      - postgres-data:/var/lib/postgresql
+    healthcheck:
+      # On first start of an empty data volume the entrypoint runs a temporary server that listens only on the unix
+      # socket. The check connects over TCP, so the service becomes healthy after that server stops and the final one
+      # accepts connections.
+      test:
+        [
+          'CMD',
+          'pg_isready',
+          '-h',
+          '127.0.0.1',
+          '-U',
+          '${POSTGRES_USER:?set POSTGRES_USER in infra/local/.env (keys in infra/local/.env.example)}',
+          '-d',
+          '${POSTGRES_DB:?set POSTGRES_DB in infra/local/.env (keys in infra/local/.env.example)}',
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+      start_interval: 1s
+
+  mailpit:
+    # SMTP on 1025, web UI and API on 8025. The image defines its own healthcheck (`/mailpit readyz`).
+    image: axllent/mailpit:v1.33.0@sha256:9b3a463be15354c0f0eba91697d80e3e0d8a5623ef0e627cacc836bc17fd5231
+    ports:
+      - '127.0.0.1:1025:1025'
+      - '127.0.0.1:8025:8025'
+
+volumes:
+  postgres-data:
