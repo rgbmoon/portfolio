@@ -29,9 +29,17 @@ The plan sets one of three modes:
 ## 0. Start
 
 1. Find the task in `docs/ROADMAP.md` (iteration and item). Choose a short kebab-case slug.
-2. The working tree must be clean and the current branch must be `main`; run `git pull --ff-only`. Otherwise stop and
-   ask Sergei.
-3. Run `git switch -c task/<slug>`. Create `work.local/tasks/<slug>/state.md` from the template at the end and update
+2. The working tree must be clean and the current branch must be `main`; otherwise stop and ask Sergei. Run
+   `git config remote.origin.prune true`, then `git pull --ff-only`: with `prune` set, the pull removes the
+   remote-tracking refs of branches deleted on GitHub.
+3. Delete the local branches whose GitHub branch is gone (GitHub deletes the branch of a merged PR). Branches without a
+   GitHub copy stay, for example the branch of a skipped task:
+
+   ```sh
+   git for-each-ref --format='%(refname:short) %(upstream:track)' refs/heads |
+     awk '$2 == "[gone]" {print $1}' | xargs -r git branch -D
+   ```
+4. Run `git switch -c task/<slug>`. Create `work.local/tasks/<slug>/state.md` from the template at the end and update
    it after every step.
 
 ## 1. Plan and Sergei's approval
