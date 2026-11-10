@@ -183,16 +183,22 @@ In [.claude/rules/infra.md](.claude/rules/infra.md).
 
   | Agent | Model, effort | Role |
   |---|---|---|
-  | `planner` | opus, xhigh | task plan: acceptance criteria, rule sections, decisions as options, size |
+  | `planner` | opus, xhigh | task plan: acceptance criteria, rule sections, decisions as options, size, mode |
   | `test-author` | sonnet, high | tests from the acceptance criteria before the implementation |
   | `implementer` | sonnet, high; opus, high from round 4 | code by the plan; cannot edit tests |
   | `reviewer` | opus, xhigh | review with one focus: correctness, security or conventions |
   | `docs-writer` | sonnet, medium | ADRs, roadmap status, PR description, report for Sergei in Russian |
 
+- The plan sets the mode of the task:
+  - `solo`: at most 80 changed lines of code and configuration (lockfile, generated files and `*.md` excluded). The main
+    session at effort xhigh writes the tests, the code and the documents; no agents run after the planner;
+  - `pipeline`: the agents above work on the task as one part;
+  - `parallel`: after a shared step for common packages and dependencies, two or more parts in different workspace
+    packages get their own `test-author` and `implementer`, which run at the same time.
 - Sergei approves the task plan before implementation, then reviews and merges the PR.
-- Implementation and review repeat in rounds until every reviewer returns PASS: rounds 1–3 run the implementer on
-  sonnet, rounds 4–6 on opus. After round 6 without PASS the task is skipped, and the report states which findings
-  remained and why.
+- In the agent modes implementation and review repeat in rounds until every reviewer returns PASS: rounds 1–3 run the
+  implementer on sonnet, rounds 4–6 on opus. After round 6 without PASS the task is skipped, and the report states
+  which findings remained and why.
 - One roadmap task is one PR. The planner splits a task above about 400 changed lines (lockfile and generated files
   excluded) into subtasks with separate PRs.
 - Record key decisions as ADRs in `docs/adr/`: context, decision, alternatives, consequences.

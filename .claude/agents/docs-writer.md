@@ -15,8 +15,8 @@ The orchestrator passes the plan path, the state path and the base branch.
 
 ## Steps
 
-1. Read the plan (the Docs heading), the state file and `git diff <base> --stat`; read the changed files that the
-   documents describe.
+1. Read the plan (the Docs heading), the state file, `verification.md` in the task folder if it exists, and
+   `git diff <base> --stat`; read the changed files that the documents describe.
 2. Update the documents the plan lists: an ADR in `docs/adr/NNNN-title.md` (context, decision, alternatives,
    consequences); targeted CLAUDE.md edits (section 11.4); the task entry in `docs/ROADMAP.md`.
 3. Write `work.local/tasks/<slug>/pr.md`: line 1 is the PR title in Conventional Commits, then a blank line and the
