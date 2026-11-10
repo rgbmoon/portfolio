@@ -44,9 +44,7 @@ In [docs/architecture/stack.md](docs/architecture/stack.md). Read it before addi
 
 ```
 .claude/
-  agents/         agents of the delivery process (section 7)
-  skills/         skills; `deliver` runs the delivery process
-  hooks/          hook scripts for settings.json and agents
+  hooks/          hook scripts for settings.json
   rules/          rules loaded by file path (table below)
 apps/
   web/            TanStack Start, FSD
@@ -94,7 +92,7 @@ this table.
 | 11.10 | [.claude/rules/tests.md](.claude/rules/tests.md) | files in `tests/`, `e2e/`, test configs |
 | 11.11 | [.claude/rules/tooling.md](.claude/rules/tooling.md) | `package.json`, workspace and tool configs, `.github/` |
 
-"On demand": the planner lists the sections a task needs in the task plan, and the agents read them. Files in
+"On demand": the task plan lists the sections the task needs, and Claude reads them before implementation. Files in
 `.claude/rules/` are added to the context when Claude reads or edits a file that matches their `paths:` filter.
 
 Rules for later iterations:
@@ -177,33 +175,16 @@ In [.claude/rules/infra.md](.claude/rules/infra.md).
 ## 7. Work process
 
 - Every iteration goes through Research → Plan → Implement → Validate.
-- Agree the iteration plan with Sergei before implementation.
-- A roadmap task is delivered by the `/deliver` skill ([.claude/skills/deliver/SKILL.md](.claude/skills/deliver/SKILL.md))
-  with the agents from `.claude/agents/`:
-
-  | Agent | Model, effort | Role |
-  |---|---|---|
-  | `planner` | opus, xhigh | task plan: acceptance criteria, rule sections, decisions as options, size, mode |
-  | `test-author` | sonnet, high | tests from the acceptance criteria before the implementation |
-  | `implementer` | sonnet, high; opus, high from round 4 | code by the plan; cannot edit tests |
-  | `reviewer` | opus, xhigh | review with one focus: correctness, security or conventions |
-  | `docs-writer` | sonnet, medium | ADRs, roadmap status, PR description, report for Sergei in Russian |
-
-- The plan sets the mode of the task:
-  - `solo`: at most 80 changed lines of code and configuration (lockfile, generated files and `*.md` excluded). The main
-    session at effort xhigh writes the tests, the code and the documents; no agents run after the planner;
-  - `pipeline`: the agents above work on the task as one part;
-  - `parallel`: after a shared step for common packages and dependencies, two or more parts in different workspace
-    packages get their own `test-author` and `implementer`, which run at the same time.
-- Sergei approves the task plan before implementation, then reviews and merges the PR.
-- In the agent modes implementation and review repeat in rounds until every reviewer returns PASS: rounds 1–3 run the
-  implementer on sonnet, rounds 4–6 on opus. After round 6 without PASS the task is skipped, and the report states
-  which findings remained and why.
-- One roadmap task is one PR. The planner splits a task above about 400 changed lines (lockfile and generated files
-  excluded) into subtasks with separate PRs.
+- A roadmap task runs in one session: Claude writes the plan, the tests, the code and the documents; subagents run only
+  at Sergei's request (section 11.5).
+- Agree the iteration plan and the plan of each roadmap task with Sergei before implementation. The task plan and its
+  status live in `work.local/tasks/<slug>/` (section 11.4).
+- Before the work is handed to Sergei, `pnpm verify` passes and Claude reviews `git diff main`: correctness, security,
+  the rules of the sections the task touches.
 - Record key decisions as ADRs in `docs/adr/`: context, decision, alternatives, consequences.
 - At the end of an iteration write a report: what was done, how it was verified, open questions, the next step. Update
   the iteration status in the roadmap.
+- Git: Sergei creates commits and PRs and pushes; the rules are in section 11.3.
 - Keep CLAUDE.md compact: details go to `docs/`, links stay here. Rules for editing CLAUDE.md — section 11.4.
 
 ## 8. Roadmap
@@ -263,16 +244,25 @@ reference: a figure of speech forces a reader to reread the line to extract the 
 
 ### 11.3 Git
 
-- Within `/deliver` Claude creates the branch `task/<slug>`, commits, pushes the branch and opens a PR into main.
-  Sergei reviews and merges PRs. Claude does not merge PRs, push to main or deploy: `.claude/hooks/guard-bash.sh`
-  blocks these commands, and branch protection blocks direct pushes to main.
-- Outside `/deliver` Claude commits and pushes only when Sergei asks, each time. Such work ends with changes in the
-  working tree; the final message lists what is ready to commit and proposes Conventional Commits messages.
-- Plans contain no "commit 1/2" steps: the `/deliver` skill makes the commits.
+- Sergei creates commits and PRs and pushes. Claude does not commit, push, open PRs or deploy unless explicitly asked,
+  each time. An approved plan that mentions commits or "branch → PR" does not grant this.
+- Work ends with changes in the working tree; the final message lists what is ready to commit and proposes Conventional
+  Commits messages. Plans contain no "commit 1/2" steps.
+- Claude does not merge PRs or push to main: `.claude/hooks/guard-bash.sh` blocks these commands, and branch protection
+  blocks direct pushes to main.
 - Commit messages: Conventional Commits in English. commitlint checks commits in the `commit-msg` hook. Commit hooks
   are never skipped (`--no-verify`).
-- One roadmap task is one branch and one PR into main. PRs are merged by squash merge: the PR title becomes the commit
-  message in main, so CI checks the PR title against Conventional Commits.
+- One roadmap task is one branch `task/<slug>` and one PR into main. A task above about 400 changed lines (lockfile and
+  generated files excluded) is split into subtasks with separate PRs. PRs are merged by squash merge: the PR title
+  becomes the commit message in main, so CI checks the PR title against Conventional Commits.
+- Before a new task starts, Claude switches to main, runs `git config remote.origin.prune true` and
+  `git pull --ff-only`, then deletes the local branches whose GitHub branch is gone (GitHub deletes the branch of a
+  merged PR):
+
+  ```sh
+  git for-each-ref --format='%(refname:short) %(upstream:track)' refs/heads |
+    awk '$2 == "[gone]" {print $1}' | xargs -r git branch -D
+  ```
 - Production is deployed only by CI.
 
 ### 11.4 CLAUDE.md files
@@ -296,8 +286,7 @@ reference: a figure of speech forces a reader to reread the line to extract the 
 The session limit is shared. The main cost is reasoning volume and the context that is resent with every call: what is
 read early becomes more expensive with each following step.
 
-- The `/deliver` skill runs the agents from `.claude/agents/` (section 7). Other subagents (Plan, Explore and
-  others) run only at Sergei's request, even if a mode procedure suggests them.
+- Subagents (Plan, Explore and others) run only at Sergei's request, even if a mode procedure suggests them.
 - Plan mode: read the tests and the relevant APIs, run the tests with timings, ask questions, write a short plan to a
   file and call ExitPlanMode right away.
 - Look up the shape of an API call by grepping its signature. Read a method body when behavior matters: side effects,

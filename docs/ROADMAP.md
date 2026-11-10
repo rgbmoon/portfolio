@@ -28,14 +28,16 @@ Scope:
 - README with commands, the `docs/` structure, ADR-0001 with the decisions from section 3.
 - Move the roadmap to `docs/ROADMAP.md`; CLAUDE.md keeps only a link (section 11.4). Done on 2026-11-10:
   sections 3, 5, 6.2, 6.5–6.7, 8–10 and 11.7–11.11 moved to the files listed in CLAUDE.md section 4.
-- Delivery process with agents (CLAUDE.md section 7): `/deliver` skill, agents, hooks. Set up on 2026-11-10; the
-  next task of this iteration is its first run.
 
 Done when:
 - one command brings up the infrastructure, web and api locally;
 - web shows the health endpoint response, with types from `packages/contracts`;
 - CI is green, and a deliberate module boundary violation fails lint;
 - the repository contains no secrets.
+
+Next task: `tooling-ci` in the branch `task/tooling-ci` — Husky with lint-staged, gitleaks and commitlint; GitHub
+Actions CI; Renovate; README and ADR-0001. The work starts from the plan approved on 2026-11-10 (local working file
+`work.local/tasks/tooling-ci/plan.md`, decisions D1–D9).
 
 ### `[ ]` Iteration 1 — Architecture and cross-cutting backend skeleton (learning)
 
