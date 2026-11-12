@@ -32,5 +32,9 @@ paths:
   dependent packages. The Turborepo cache is saved between runs (`actions/cache`, `.turbo/cache`); Playwright browsers
   are installed only when the e2e task has no cache entry.
 - Tests and e2e run in CI; pre-commit runs only lint-staged and gitleaks.
+- A workflow pins each action to the commit SHA of its newest release that is at least 7 days old, with a `# vX.Y.Z`
+  comment. A `docker://` step references the image by exact tag plus index digest. A container step that runs git sets
+  `safe.directory` through `GIT_CONFIG_*` variables: GitHub starts the container with `HOME=/github/home`, so git
+  ignores the global config of the image and refuses the checkout owned by the runner user.
 - Deploy runs only from main after green checks and e2e. The deploy job publishes the build artifact from the e2e job,
   so the verified build is published. A manual workflow run executes the same checks with `turbo --force`.
