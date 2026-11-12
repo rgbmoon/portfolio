@@ -30,10 +30,11 @@ Versions checked on 2026-11-08.
 | Routing, data, state | TanStack Router, TanStack Query, Zustand | |
 | Styles | Tailwind | |
 | Accessible primitives | Base UI, package `@base-ui/react` (recommendation) | Confirmed in iteration 3. The old package `@base-ui-components/react` stopped at 1.0.0-rc.0 |
+| Forms | React Hook Form | Chosen on 2026-11-12; installed with the first form in iteration 6 |
 | i18n | Paraglide JS, locales `ru` and `en` | |
 | WebGL | PixiJS v8 | Own package `packages/pixi-charts` |
 | Backend tests | Vitest, Testcontainers (PostgreSQL 18), supertest | Strategy — iteration 2 |
-| Frontend tests | Sergei's strategy | Sergei provides it in iteration 3 |
+| Frontend tests | Vitest, Playwright | Sergei's strategy from pixi-demos, adapted in `docs/testing/frontend.md` in iteration 3 |
 | Migration and API control | squawk, `prisma migrate diff`, oasdiff | |
 | Infrastructure | Docker, Docker Compose, docker rollout, Caddy, GitHub Actions, GHCR, VPS | Kubernetes is deferred (section 10) |
 | DNS, form protection | Cloudflare DNS, Cloudflare Turnstile | |

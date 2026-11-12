@@ -63,6 +63,8 @@ Implementation:
 - Env validation by a Zod schema via `@nestjs/config`.
 - `StandardSchemaValidationPipe` and `StandardSchemaSerializerInterceptor`.
 - The `Clock` and `PubSub` interfaces, `Idempotency-Key`.
+- A thin web API client with Problem Details parsing (section 5.4); the health page switches to it. The client is
+  built here because the error format is designed together with the filter.
 
 Result: `docs/architecture/` with Mermaid diagrams, an ADR for each decision, the cross-cutting skeleton in code.
 
@@ -86,27 +88,31 @@ health endpoint passes through the whole skeleton: context, logs with `requestId
 
 Result: `docs/testing/backend.md`, test infrastructure, example tests on the health module.
 
-### `[ ]` Iteration 3 — Frontend skeleton
+### `[~]` Iteration 3 — Frontend skeleton
 
-- At the start of the iteration ask Sergei for his frontend testing strategy. Write tests only according to it.
+- Frontend testing strategy: Sergei's strategy from pixi-demos (`docs/testing.html`), adapted to this project in
+  `docs/testing/frontend.md`. Tests are written only according to it.
 - Move the rules from `docs/conventions/web.md` into `apps/web/CLAUDE.md` and confirm them with Sergei.
 - FSD structure and Steiger.
-- TanStack Start: routing, prerendering, code splitting. Prototype "Start → static directory → Caddy with `try_files`
-  to the shell", version pinning (section 5.5).
-- Session after hydration, protected routes with `ssr: false`, PixiJS via dynamic import.
-- A thin API client with Problem Details parsing (section 5.4).
+- TanStack Start: routing, prerendering, code splitting by routes. Prototype "Start → static directory → Caddy with
+  `try_files` to the shell", version pinning (section 5.5).
 - Paraglide JS: `ru` and `en`, URL prefixes, `hreflang`.
-- Case page structure in FSD, content format per locale (section 5.9), case image optimization (open question in
-  section 9).
+- Session stub:
+  - the base user contract in `packages/contracts`: the `/api/v1/me` response;
+  - `GET /api/v1/me` in `apps/api` always responds 200 with a fixed demo user; iteration 6 replaces it with the real
+    session;
+  - a protected route with `ssr: false` requests the session after hydration.
+- Case page structure in FSD on a stub case, content format per locale (section 5.9), case image optimization (open
+  question in section 9).
 - `packages/ui`: tokens, Tailwind theme, the final choice of the headless library (Base UI or React Aria), first
   components.
-- Form library choice: React Hook Form or TanStack Form.
-- SEO basics (section 5.10), Lighthouse CI with budgets, size-limit, a stub for sending metrics via `web-vitals`.
+- SEO basics (section 5.10), Lighthouse CI with budgets, size-limit for the main bundle, a stub for sending metrics via
+  `web-vitals`.
 - `vite build` does not evaluate modules: a build without `VITE_API_URL` passes, and the page fails on load.
   Prerendering evaluates `config.ts` at build time; check that a missing variable fails the build.
 
-Done when the static output prototype works behind Caddy, both locales serve prerendered pages, Lighthouse budgets are
-met, and tests per Sergei's strategy run in CI.
+Done when the static output prototype works behind Caddy, both locales serve prerendered pages, the protected route
+shows the demo user from the api, Lighthouse budgets are met, and tests per Sergei's strategy run in CI.
 
 ### `[ ]` Iteration 4 — Infra-1: first production deploy
 
@@ -174,7 +180,10 @@ API serves them, and tests cover the limits of the intake endpoint.
 - `audit_log`.
 - Account deletion with a cascade via `user.deleted`, data export by a pg-boss job.
 - Privacy policy and terms of use in `ru`/`en` — before configuring the Google OAuth consent screen.
-- Account UI: sign-in, sign-up, session list and revocation, account deletion.
+- Account UI: sign-in, sign-up, session list and revocation, account deletion. Forms on React Hook Form (section 3).
+- `GET /api/v1/me` returns the real session in place of the iteration 3 stub; the protected route redirects an
+  anonymous user to sign-in.
+- Decide with Sergei whether React pages get jsdom tests with Testing Library (frontend testing strategy).
 
 Done when tests cover all flows, limits, quotas and bans are verified, and account deletion removes the user's data in
 all modules.
@@ -200,6 +209,8 @@ all modules.
 ### `[ ]` Iteration 9 — PixiJS
 
 - `packages/pixi-charts`; move the rules from `docs/conventions/pixi.md` into `packages/pixi-charts/CLAUDE.md`.
+- PixiJS is loaded by dynamic `import()` only on pages that need it; the size-limit budget of the main bundle excludes
+  Pixi (section 5.4).
 - A Web Vitals metrics dashboard on `pixi-charts` on top of the API from iteration 5.
 - The pixi-demos case (github.com/rgbmoon/pixi-demos): decide how to embed it.
 - An interactive part with data stored on the backend: a shared drawing board (preferred — it meets the "no game
@@ -246,7 +257,6 @@ all modules.
 | Case page content format | Iteration 3 |
 | Case image variants: generated at build time (section 5.10) or precomputed by a script and committed (section 11.6) | Iteration 3 |
 | Base UI or React Aria | Iteration 3 |
-| React Hook Form or TanStack Form | Iteration 3 |
 | VPS provider | Iteration 4 |
 | Zero-downtime deploy tool: docker rollout or a script | Iteration 4 |
 | Free cloud OpenTelemetry backend | Iteration 4 |
