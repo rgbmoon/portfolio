@@ -12,6 +12,8 @@ block() {
 
 # Patterns stop at a line break or a command separator, so text in a heredoc (a commit message) does not match.
 re_no_verify=$'(^|[;&|[:space:]])git[[:space:]][^;&|\n]*--no-verify'
+# Husky skips every hook when HUSKY=0: as a command prefix, after `env` or `export`.
+re_husky_off=$'(^|[;&|[:space:]])HUSKY=["\']?0'
 re_merge='(^|[;&|[:space:]])gh[[:space:]]+pr[[:space:]]+merge'
 # Group 2 is one git push segment: it ends at a command separator or a line break.
 re_push=$'(^|[;&|[:space:]])(git([[:space:]]+-C[[:space:]]+[^[:space:]]+)?[[:space:]]+push[^;&|\n]*)'
@@ -21,6 +23,7 @@ re_env_reader='(cat|less|more|head|tail|grep|rg|sed|awk|source|cp|mv|scp|curl|ba
 re_env=$'(^|[;&|[:space:]])'"$re_env_reader"$'[[:space:]][^;&|\n]*\\.env($|[[:space:];&|"\'/]|\\.local)'
 
 [[ $cmd =~ $re_no_verify ]] && block "commit hooks are never skipped (CLAUDE.md section 11.3)"
+[[ $cmd =~ $re_husky_off ]] && block "commit hooks are never skipped (CLAUDE.md section 11.3)"
 [[ $cmd =~ $re_merge ]] && block "Sergei merges PRs (CLAUDE.md section 11.3)"
 # Each push segment is checked on its own: words of other commands in the same line (`gh pr create --base main`,
 # `rm -f`) do not match.
