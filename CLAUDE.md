@@ -46,6 +46,9 @@ In [docs/architecture/stack.md](docs/architecture/stack.md). Read it before addi
 .claude/
   hooks/          hook scripts for settings.json
   rules/          rules loaded by file path (table below)
+.github/
+  workflows/      CI and the PR title check
+.husky/           git hooks: pre-commit, commit-msg
 apps/
   web/            TanStack Start, FSD
   api/            NestJS, modular monolith
