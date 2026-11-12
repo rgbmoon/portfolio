@@ -43,6 +43,10 @@ General principles. The backend strategy is defined in iteration 2, the frontend
 - Tests run in the node environment by default; a file that needs a browser API declares `// @vitest-environment
   jsdom` on its first line.
 - `globalSetup` builds heavy fixtures once per run; tests receive them through `inject`.
+- A test of a lint rule lints source text through the ESLint API with the root config, as the text of an existing
+  file, and asserts the exact rule ID. The allowed case asserts an empty message list: a fatal parsing error has no
+  rule ID and passes a check for "no message with this rule". The `test` inputs of that package in `turbo.json` include
+  `$TURBO_ROOT$/eslint.config.ts`.
 
 **CI and load:**
 - CPU-heavy tests next to type-aware ESLint and `tsc` slow down several times on a runner and exceed `testTimeout`.

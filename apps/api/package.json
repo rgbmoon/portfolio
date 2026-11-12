@@ -11,6 +11,7 @@
     "dev:start": "node --env-file-if-exists=.env --watch --enable-source-maps dist/main.js | pino-pretty",
     "lint": "eslint .",
     "typecheck": "tsc",
+    "test": "vitest run",
     "test:e2e": "vitest run --config vitest.e2e.config.ts"
   },
   "dependencies": {
@@ -29,6 +30,7 @@
   "devDependencies": {
     "@rspack/cli": "catalog:",
     "@rspack/core": "catalog:",
+    "eslint": "catalog:",
     "pino-pretty": "catalog:",
     "vitest": "catalog:"
   }

@@ -7,5 +7,5 @@
     "erasableSyntaxOnly": false,
     "useDefineForClassFields": false
   },
-  "include": ["src", "e2e", "*.config.ts"]
+  "include": ["src", "tests", "e2e", "*.config.ts"]
 }
