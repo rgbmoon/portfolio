@@ -16,6 +16,11 @@ paths:
   - Express: `trust proxy` = 1. Caddy replaces the client IP header value and passes `X-Request-Id`.
 - **Images:** multi-stage, `node:26-slim`, non-root user, `read_only` with `tmpfs`, tags by git SHA, memory limits and a
   matching `--max-old-space-size`, Docker log rotation (`max-size`, `max-file`).
+- **Image references:** compose files, Dockerfiles and workflow `docker://` steps pin an exact version tag plus the
+  index digest (`image:18.6-trixie@sha256:...`). The digest is at least 7 days old, as the Renovate delay. Docker Hub
+  gives the push date only for the current digest of a tag; the age of an older digest comes from the history of
+  `docker-library/repo-info` (`repos/<image>/remote/<tag>.md`). Verify the digest with
+  `docker buildx imagetools inspect`.
 - **Zero-downtime deploy:**
   1. backup;
   2. migrations container;

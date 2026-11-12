@@ -13,7 +13,7 @@ Versions checked on 2026-11-08.
 | OpenAPI | `@nestjs/swagger` 12 + `zod-openapi` via `standardSchemaConverter` | |
 | Configuration | `@nestjs/config` with env validation by a Zod schema | |
 | Request context, transactions | `nestjs-cls`, `@nestjs-cls/transactional` + Prisma adapter | The adapter declares `prisma > 4 < 9`; verify with Prisma 7 in iteration 5. Fallback — own wrapper on AsyncLocalStorage with the same API |
-| DB | PostgreSQL 18+ | Built-in `uuidv7()` is required |
+| DB | PostgreSQL 18+ | Built-in `uuidv7()` is required. Image variant Debian `trixie` (glibc collation) in local compose, Testcontainers and production compose |
 | ORM | Prisma 7.10.1 + `@prisma/adapter-pg` 7.10.1, exact versions | The npm tag `latest` of `prisma` points to 8.0 RC: install only with an explicit version. Renovate forbids major 8 |
 | Queues, cron, reliable events | pg-boss (stores jobs in PostgreSQL) | A job is enqueued in the same transaction as the data |
 | Redis / Valkey | Not used at the start | Section 10 |
