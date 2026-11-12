@@ -7,9 +7,9 @@ section 7).
 
 Statuses: `[ ]` not started, `[~]` in progress, `[x]` done.
 
-### `[~]` Iteration 0 — Skeleton and tooling
+### `[x]` Iteration 0 — Skeleton and tooling
 
-Goal: a working monorepo with quality tools and a local environment.
+Goal: a working monorepo with quality tools and a local environment. Closed on 2026-11-12.
 
 Scope:
 - Start procedure: done on 2026-11-08 — rules transferred (section 11), versions checked (section 3), language and git
@@ -34,10 +34,6 @@ Done when:
 - web shows the health endpoint response, with types from `packages/contracts`;
 - CI is green, and a deliberate module boundary violation fails lint;
 - the repository contains no secrets.
-
-Next task: `tooling-ci` in the branch `task/tooling-ci` — Husky with lint-staged, gitleaks and commitlint; GitHub
-Actions CI; Renovate; README and ADR-0001. The work starts from the plan approved on 2026-11-10 (local working file
-`work.local/tasks/tooling-ci/plan.md`, decisions D1–D9).
 
 ### `[ ]` Iteration 1 — Architecture and cross-cutting backend skeleton (learning)
 
@@ -106,6 +102,8 @@ Result: `docs/testing/backend.md`, test infrastructure, example tests on the hea
   components.
 - Form library choice: React Hook Form or TanStack Form.
 - SEO basics (section 5.10), Lighthouse CI with budgets, size-limit, a stub for sending metrics via `web-vitals`.
+- `vite build` does not evaluate modules: a build without `VITE_API_URL` passes, and the page fails on load.
+  Prerendering evaluates `config.ts` at build time; check that a missing variable fails the build.
 
 Done when the static output prototype works behind Caddy, both locales serve prerendered pages, Lighthouse budgets are
 met, and tests per Sergei's strategy run in CI.
@@ -118,7 +116,10 @@ met, and tests per Sergei's strategy run in CI.
 - Dockerfile for api (section 6.7). Production compose: api and PostgreSQL.
 - Caddy: HTTPS, serving web static files, reverse proxy for REST and WebSocket, `X-Request-Id`, the real client IP, WS
   stream settings.
-- `/health/live`, `/health/ready`, `enableShutdownHooks`, `stop_grace_period`.
+- `/health/live`, `/health/ready`, `enableShutdownHooks`, `stop_grace_period`. On SIGTERM the api exits with status
+  143: Nest runs the shutdown hooks, then re-raises the signal.
+- The root `prepare` script runs `husky` on every install that changes `node_modules`; check it in the Docker build
+  stage, which has no `.git` folder.
 - GitHub Actions: image build, publishing to GHCR, zero-downtime deploy in the order of section 6.7. Secrets — in GitHub
   Environments.
 - PostgreSQL backups to R2 and a weekly automatic restore check.
