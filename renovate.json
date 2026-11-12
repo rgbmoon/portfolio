@@ -1,0 +1,29 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended", "helpers:pinGitHubActionDigestsToSemver"],
+  "minimumReleaseAge": "7 days",
+  "packageRules": [
+    {
+      "description": "Prisma 8 is adopted only after GA, in a separate iteration (CLAUDE.md section 6.4).",
+      "matchPackageNames": ["prisma", "@prisma/*"],
+      "allowedVersions": "<8.0.0"
+    },
+    {
+      "description": "The @nestjs/* packages declare peer ranges on each other and update in one PR.",
+      "matchPackageNames": ["@nestjs/*"],
+      "groupName": "nestjs"
+    },
+    {
+      "description": "typescript-eslint 8 declares the peer range typescript <6.1.0; TypeScript 7 waits for typescript-eslint and @nestjs/cli (docs/ROADMAP.md section 10).",
+      "matchPackageNames": ["typescript"],
+      "allowedVersions": "<6.1.0"
+    },
+    {
+      "description": "A PostgreSQL 18+ image keeps data in /var/lib/postgresql/<major>/docker, so a new major starts an empty cluster in the same volume; a major upgrade needs a manual data migration.",
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["postgres"],
+      "matchUpdateTypes": ["major"],
+      "enabled": false
+    }
+  ]
+}

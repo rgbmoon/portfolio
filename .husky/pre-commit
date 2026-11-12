@@ -1,0 +1,3 @@
+lint-staged
+# gitleaks is installed separately (README.md). It runs after lint-staged and scans the staged changes with its fixes.
+gitleaks git --pre-commit --staged --redact --no-banner -v
