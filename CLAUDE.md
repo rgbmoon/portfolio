@@ -81,7 +81,7 @@ this table.
 |---|---|---|
 | 3 | [docs/architecture/stack.md](docs/architecture/stack.md) | on demand |
 | 5.1–5.3, 5.6 | [apps/api/CLAUDE.md](apps/api/CLAUDE.md) | when Claude reads a file in `apps/api` |
-| 5.4, 5.5, 5.9, 5.10, 6.5 | [apps/web/CLAUDE.md](apps/web/CLAUDE.md) | when Claude reads a file in `apps/web` |
+| 5.4, 5.5, 5.9, 5.10, 6.5, 11.12 | [apps/web/CLAUDE.md](apps/web/CLAUDE.md) | when Claude reads a file in `apps/web` |
 | 5.7 | [docs/architecture/auth.md](docs/architecture/auth.md) | on demand |
 | 5.8 | [docs/architecture/ugc-moderation.md](docs/architecture/ugc-moderation.md) | on demand |
 | 5.11 | [docs/architecture/files.md](docs/architecture/files.md) | on demand |
@@ -102,7 +102,6 @@ Rules for later iterations:
 
 | File | Contents | Moves to |
 |---|---|---|
-| [docs/conventions/web.md](docs/conventions/web.md) | web app: React, client errors, client storage, browser specifics, e2e, review materials | `apps/web/CLAUDE.md` in iteration 3 |
 | [docs/conventions/pixi.md](docs/conventions/pixi.md) | PixiJS: model and adapter, runtime, events, library documentation | `packages/pixi-charts/CLAUDE.md` in iteration 9 |
 
 ## 5. Architecture principles
@@ -333,3 +332,7 @@ In [.claude/rules/tests.md](.claude/rules/tests.md).
 ### 11.11 Tooling
 
 In [.claude/rules/tooling.md](.claude/rules/tooling.md).
+
+### 11.12 Web app conventions
+
+In [apps/web/CLAUDE.md](apps/web/CLAUDE.md).
