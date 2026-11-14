@@ -5,6 +5,7 @@ packages:
 # Exact versions shared by all workspace packages (CLAUDE.md section 6.4). A pinned version must be older than
 # minimumReleaseAge, otherwise install fails.
 catalog:
+  '@babel/core': 7.29.13
   '@commitlint/cli': 21.2.4
   '@commitlint/config-conventional': 21.2.4
   '@eslint/js': 10.0.1
@@ -12,6 +13,7 @@ catalog:
   '@nestjs/config': 12.1.1
   '@nestjs/core': 12.4.0
   '@nestjs/platform-express': 12.4.0
+  '@rolldown/plugin-babel': 0.3.1
   '@rspack/cli': 2.3.1
   '@rspack/core': 2.3.1
   '@tailwindcss/vite': 4.3.5
@@ -22,6 +24,7 @@ catalog:
   '@types/react': 19.3.0
   '@types/react-dom': 19.3.0
   '@vitejs/plugin-react': 6.2.1
+  babel-plugin-react-compiler: 1.0.0
   eslint: 10.14.0
   eslint-import-resolver-typescript: 4.4.5
   eslint-plugin-boundaries: 7.4.2

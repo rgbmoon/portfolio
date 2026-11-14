@@ -96,6 +96,13 @@ Importing downward is allowed, upward only `import type`.
   movement, and on touch devices its DOM buttons would intercept `pointerdown` from the canvas. Keyboard and screen
   readers activate the buttons without it. `select-none` and `-webkit-touch-callout: none` on the canvas disable the
   long-tap menu on iOS.
+- The accessibility layer is enabled in every build: without it the canvas buttons are unavailable to screen readers
+  and the keyboard; e2e tests locate them through it. Verified in pixi-demos on PixiJS 8.19; re-check in iteration 9:
+  - the `accessibilityOptions.enabledByDefault` option has no effect: application initialization removes the
+    accessibility system from the `postrender` hook after the option activates it. The host calls
+    `app.renderer.accessibility.setAccessibilityEnabled(true)` after `app.init()`;
+  - `accessibleChildren = false` on a button also blocks the registration of the button itself: the tree walk stops
+    at this flag before it checks the accessibility of the current object.
 
 ## Events
 

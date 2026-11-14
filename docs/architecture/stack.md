@@ -27,6 +27,7 @@ Versions checked on 2026-11-08.
 | Realtime | `@nestjs/websockets` + `@nestjs/platform-ws` (ws), client — partysocket | Section 5.6 |
 | Logs, observability | Pino (`nestjs-pino`), OpenTelemetry, Sentry (free plan), external uptime monitoring | |
 | Frontend framework | TanStack Start 1.x (Vite 8) | Versions are pinned |
+| React Compiler | `babel-plugin-react-compiler` through `@rolldown/plugin-babel` and Babel 7 | Chosen on 2026-11-14. The Rust port in `@vitejs/plugin-react` (`oxc-transform-react`) is experimental. Babel 7 is already installed through `@tanstack/router-plugin`; `@babel/generator` 8 pins the beta `@jridgewell/gen-mapping@0.4.0-beta.0`. The compiler lint rules come with `eslint-plugin-react-hooks` `recommended` |
 | Routing, data, state | TanStack Router, TanStack Query, Zustand | |
 | Styles | Tailwind | |
 | Accessible primitives | Base UI, package `@base-ui/react` (recommendation) | Confirmed in iteration 3. The old package `@base-ui-components/react` stopped at 1.0.0-rc.0 |
@@ -34,7 +35,7 @@ Versions checked on 2026-11-08.
 | i18n | Paraglide JS, locales `ru` and `en` | |
 | WebGL | PixiJS v8 | Own package `packages/pixi-charts` |
 | Backend tests | Vitest, Testcontainers (PostgreSQL 18), supertest | Strategy — iteration 2 |
-| Frontend tests | Vitest, Playwright | Sergei's strategy from pixi-demos, adapted in `docs/testing/frontend.md` in iteration 3 |
+| Frontend tests | Vitest, Playwright | Sergei's strategy from pixi-demos, adapted in [docs/testing/frontend.md](../testing/frontend.md) |
 | Migration and API control | squawk, `prisma migrate diff`, oasdiff | |
 | Infrastructure | Docker, Docker Compose, docker rollout, Caddy, GitHub Actions, GHCR, VPS | Kubernetes is deferred (section 10) |
 | DNS, form protection | Cloudflare DNS, Cloudflare Turnstile | |

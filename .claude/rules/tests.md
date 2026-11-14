@@ -8,7 +8,8 @@ paths:
 
 # Tests (CLAUDE.md section 11.10)
 
-General principles. The backend strategy is defined in iteration 2, the frontend strategy is Sergei's (iteration 3).
+General principles. The backend strategy is defined in iteration 2; the frontend strategy is in
+[docs/testing/frontend.md](../../docs/testing/frontend.md).
 
 **What to test:**
 - A wide unit base of the classic pyramid is rejected. In TypeScript the typecheck and a strict linter cover the unit

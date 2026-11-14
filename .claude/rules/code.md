@@ -100,7 +100,7 @@ paths:
 - `any`, `@ts-ignore`, `console.*`, `debugger` (api logs through Pino; in web the exceptions are trace functions).
 - Empty `catch`, floating promises.
 - Module-scope singletons.
-- Manual memoization without need.
+- Manual memoization in `apps/web`: React Compiler memoizes components and hooks (section 11.12).
 - Types, constants and free functions in a class file.
 
 ## 11.9 Comments and JSDoc
